@@ -124,10 +124,56 @@ Behaviour that clients must know:
   promised under concurrency: requests batched together can change the numerics. Clients that
   need reproducibility (datagen) should rely on their own cache, not on the seed.
 
-Not measured yet: quality (the `hrn-evals` pass rate next to the hosted models), Q8_0 against
-Q4_0 (Q8_0 is 26.9 GiB, far over the free VRAM, so the comparison needs the CPU or a smaller
-model), and a judge model from another family for datagen (planned: Qwen3.6-35B-A3B, 20.4 GiB at
-Q4_K_M, so more of it on the CPU).
+### Phase 1, continued: six smaller models and quality (2026-10-01)
+
+Measured by `bench sweep` (cristiangirlea/llm-agent-benchmark), whose
+`sweeps/local-7900xt.json` now holds the launch settings for every model; `scripts/serve.sh`
+stays the Gemma 4 26B launch measured above. Every model: 4 slots of 24k context, q8_0 KV cache.
+Quality is `hrn-evals` (7 tasks, 3 attempts each) through hrn's api backend against this server,
+next to Claude Sonnet and Codex through their CLIs. Full table and failure analysis:
+`docs/results/2026-10-01.md` in llm-agent-benchmark.
+
+| model (file) | GiB | CPU expert layers | decode t/s | total t/s ×4 | passed |
+|---|---:|---:|---:|---:|---:|
+| Qwen3.5-4B Q4_K_M | 2.6 | 0 | 124 | 303 | 14/21 |
+| Gemma 4 E4B Q4_0 | 4.3 | 0 | 95 | 304 | 19/21 |
+| Granite 4.2 8B Q4_K_M | 5.0 | 0 | 82 | 257 | 20/21 |
+| Qwen3.5-9B Q4_K_M | 5.3 | 0 | 83 | 226 | 19/21 |
+| **Ornith-1.5-9B Q4_K_M** | 5.4 | 0 | 101 | 279 | **21/21** |
+| **gpt-oss-20b MXFP4** | 11.3 | 0 | **164** | 288 | 20/21 |
+| Gemma 4 26B-A4B Q4_0 | 13.6 | 12 | 43 | 96 | 20/21 |
+| *Claude Sonnet (CLI)* | | | | | *20/21* |
+| *Codex (CLI)* | | | | | *21/21* |
+
+All seven files are listed with their SHA-256 in `.models/SHA256SUMS` (git-ignored, beside the
+files). Gemma 4 26B runs 12 layers on the CPU here, not the 8 measured best above, because 24k of
+context per slot needs more VRAM than 8k.
+
+**gpt-oss-20b: offload only what does not fit.** The sweep first ran it with 8 expert layers on
+the CPU by analogy with Gemma 4 26B: 45 t/s. It fits on the GPU entirely, and every layer moved
+off costs speed (`llama-bench`, prefill 2048 / decode 128):
+
+| expert layers on CPU | prefill t/s | decode t/s |
+|---:|---:|---:|
+| **0** | **3399** | **157.7** |
+| 2 | 1796 | 49.9 |
+| 4 | 1217 | 42.6 |
+| 8 | 770 | 35.2 |
+| 12 | 673 | 31.5 |
+
+As a server with 4 slots and 96k context: 168 t/s for one request, 305 t/s total for four, 18.4
+GiB dedicated, shared memory at the desktop's own 2.5 GiB. The rule for this card: measure first
+with nothing on the CPU; move expert layers off only when shared memory grows past the baseline.
+
+**What it means for the workloads.** For agent work, a 9B fine-tune (Ornith) matched the hosted
+agents on these small tasks at about 100 t/s, and gpt-oss-20b is the fastest model that still
+passes nearly everything. The larger Gemma 4 26B gained nothing here and is the slowest, because it
+does not fit. The tasks are small, though; a harder suite is what would show whether the larger
+models earn their cost.
+
+Not measured yet: Q8_0 against Q4_0 for the same model, harder suites (multi-file changes,
+longer contexts), and a judge model from another family for datagen (planned: Qwen3.6-35B-A3B,
+20.4 GiB at Q4_K_M, so part of it on the CPU).
 
 ## Phase 2: in the cluster
 
