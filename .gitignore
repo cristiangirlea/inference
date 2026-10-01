@@ -2,3 +2,5 @@ models/
 *.gguf
 *.safetensors
 .env
+.models/
+.bin/
