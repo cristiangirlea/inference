@@ -51,8 +51,14 @@ on what else is running.
 
 ## Working rules
 
-- One branch per change, one PR; the owner merges. Never `gh pr merge`, never push to `main`,
-  never tag, release or deploy: hand the owner the command.
+- One branch per change, one PR. **Everything is tested before a merge**: the full local checks
+  (`/check`; there is no CI yet) and tests for every behaviour the change adds or alters. Only
+  then may an agent merge its PR, and only through the PR (`gh pr merge <n> --merge
+  --delete-branch --match-head-commit <sha>`), when an independent review ran and its findings
+  are fixed, a security read of the diff has nothing open, and the head being merged is the
+  commit all of that ran on. What could not be tested (a measurement on the shared GPU) is said
+  in the PR and waits for the owner. Never auto-merge (`--auto`) or `--admin`, never push to
+  `main`, never tag, release or deploy: hand the owner the command.
 - Commit messages: plain sentences with a lowercase area first, as in the log
   (`plan: six smaller models measured with quality, ...`). No conventional-commit prefixes, no
   emoji, no AI attribution lines.

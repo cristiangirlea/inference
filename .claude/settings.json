@@ -67,7 +67,6 @@
       "PowerShell(hf download *)"
     ],
     "deny": [
-      "Bash(gh pr merge *)",
       "Bash(gh release *)",
       "Bash(git push --force *)",
       "Bash(git push -f *)",
@@ -76,7 +75,6 @@
       "Read(**/*.key)",
       "Read(**/*.pem)",
       "Read(~/.cache/huggingface/token)",
-      "Bash(gh pr merge)",
       "Bash(gh api *-X PUT*)",
       "Bash(gh api *--method PUT*)",
       "Bash(gh api *-XPUT*)",
@@ -90,11 +88,9 @@
       "Bash(git push *refs/tags/*)",
       "Bash(git push *--mirror*)",
       "Bash(git push *--delete*)",
-      "PowerShell(gh pr merge *)",
       "PowerShell(gh release *)",
       "PowerShell(git push --force *)",
       "PowerShell(git push -f *)",
-      "PowerShell(gh pr merge)",
       "PowerShell(gh api *-X PUT*)",
       "PowerShell(gh api *--method PUT*)",
       "PowerShell(gh api *-XPUT*)",
@@ -107,7 +103,11 @@
       "PowerShell(git push *--tags*)",
       "PowerShell(git push *refs/tags/*)",
       "PowerShell(git push *--mirror*)",
-      "PowerShell(git push *--delete*)"
+      "PowerShell(git push *--delete*)",
+      "Bash(gh pr merge *--auto*)",
+      "Bash(gh pr merge *--admin*)",
+      "PowerShell(gh pr merge *--auto*)",
+      "PowerShell(gh pr merge *--admin*)"
     ]
   }
 }

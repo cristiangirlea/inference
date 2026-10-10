@@ -15,4 +15,5 @@ Report one line per step (passed, or the error). Never download model weights, u
 builds, start `llama-server` or run `scripts/throughput.py` as part of a check: those are
 measurement runs on the owner's shared GPU. If the change touches `PLAN.md`, confirm that no
 recorded number changed without a new measurement behind it (`git diff origin/main -- PLAN.md`).
-Never merge, never push to `main`.
+Never push to `main`. This skill does not merge: merging is through the PR, under AGENTS.md's
+conditions.
