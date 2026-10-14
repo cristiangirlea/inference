@@ -23,7 +23,7 @@ eval suites and cluster manifests do not belong here.
 
 ## Checks
 
-There is no CI. Before a PR (`/check` runs these), with Python 3 and nothing installed:
+CI runs these on GitHub's hosted runners. Before a PR (`/check` runs them), with Python 3 and nothing installed:
 
 ```bash
 bash -n scripts/serve.sh
@@ -52,7 +52,7 @@ on what else is running.
 ## Working rules
 
 - One branch per change, one PR. **Everything is tested before a merge**: the full local checks
-  (`/check`; there is no CI yet) and tests for every behaviour the change adds or alters. Only
+  (`/check`), CI green, and tests for every behaviour the change adds or alters. Only
   then may an agent merge its PR, and only through the PR (`gh pr merge <n> --merge
   --delete-branch --match-head-commit <sha>`), when an independent review ran and its findings
   are fixed, a security read of the diff has nothing open, and the head being merged is the
