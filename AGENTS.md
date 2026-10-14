@@ -62,7 +62,8 @@ on what else is running.
 - Commit messages: plain sentences with a lowercase area first, as in the log
   (`plan: six smaller models measured with quality, ...`). No conventional-commit prefixes, no
   emoji, no AI attribution lines.
-- Any CI added later runs on the owner's runners (`vars.CI_RUNNER`, `vars.CI_RUNNER_WINDOWS`);
-  this private repo spends no GitHub Actions minutes. Never add a hosted-runner fallback.
+- CI runs on GitHub's hosted runners (`.github/workflows/ci.yml`): this repository is public, so
+  never point it at the owner's runners. CI runs the offline checks only, never a model download,
+  a `llama-server` start or a measurement.
 - Secrets (`.env`, API keys, Hugging Face tokens) are never read, printed or committed.
 - Small diffs: don't restyle what you didn't change. Not sure? Ask, with one proposal.
